@@ -2,10 +2,6 @@
 session_start();
 include("includes/db.php");
 
-/*
-   Fetch cities from cities table
-   (Relational structure compatible)
-*/
 $query = "SELECT * FROM cities";
 $result = mysqli_query($conn, $query);
 ?>
@@ -95,7 +91,7 @@ body, html {
 <div class="bg-image"></div>
 <div class="overlay"></div>
 
-<!-- Navbar -->
+
 <nav class="navbar navbar-expand-lg navbar-dark bg-transparent">
   <div class="container">
     <a class="navbar-brand fw-bold text-white" href="#">Saanidhya</a>
@@ -121,7 +117,7 @@ body, html {
 
 <div class="container">
 
-    <!-- Hero Section -->
+  
     <div class="hero">
         <h1 class="display-4">Welcome to Saanidhya</h1>
 
@@ -130,7 +126,7 @@ body, html {
         </p>
     </div>
 
-    <!-- City Cards -->
+    
     <div class="row justify-content-center mb-5">
 
         <?php if(mysqli_num_rows($result) > 0) { ?>
@@ -162,7 +158,6 @@ body, html {
 
 </div>
 
-<!-- Dynamic Subheading Script -->
 <script>
 const messages = [
 "Find Safe & Verified Rooms in Jalandhar & Phagwara",
