@@ -4,25 +4,20 @@ include("includes/db.php");
 
 if(isset($_POST['register'])){
 
-    $name = $_POST['name'];
-    $email = $_POST['email'];
-    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-    $role = $_POST['role'];
+$name=mysqli_real_escape_string($conn,$_POST['name']);
+$email=mysqli_real_escape_string($conn,$_POST['email']);
+$password=password_hash($_POST['password'],PASSWORD_DEFAULT);
+$role=$_POST['role'];
 
-    $check = mysqli_query($conn,"SELECT * FROM users WHERE email='$email'");
+$check=mysqli_query($conn,"SELECT * FROM users WHERE email='$email'");
 
-    if(mysqli_num_rows($check) > 0){
-        echo "<script>alert('Email already exists');</script>";
-    } else {
-
-        mysqli_query($conn,"
-        INSERT INTO users (name,email,password,role)
-        VALUES ('$name','$email','$password','$role')
-        ");
-
-        header("Location: login.php");
-        exit();
-    }
+if(mysqli_num_rows($check)>0){
+$error="Email already exists";
+}else{
+mysqli_query($conn,"INSERT INTO users(name,email,password,role) VALUES('$name','$email','$password','$role')");
+header("Location: login.php");
+exit();
+}
 }
 ?>
 
@@ -31,50 +26,21 @@ if(isset($_POST['register'])){
 <head>
 <title>Register</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
 <style>
-body{
-    margin:0;
-    font-family:'Segoe UI',sans-serif;
-    background:url('https://images.unsplash.com/photo-1522708323590-d24dbb6b0267') no-repeat center center/cover;
-    min-height:100vh;
-}
-
-.overlay{
-    position:fixed;
-    width:100%;
-    height:100%;
-    backdrop-filter:blur(8px);
-    background:rgba(0,0,0,0.6);
-}
-
-.content{
-    position:relative;
-    z-index:2;
-    padding-top:100px;
-}
-
-.form-box{
-    background:rgba(255,255,255,0.1);
-    backdrop-filter:blur(12px);
-    border-radius:20px;
-    padding:30px;
-    color:white;
-}
+body{background:#f5f5f5;}
+.box{max-width:400px;margin:80px auto;padding:30px;background:white;border-radius:10px;}
 </style>
 </head>
 
 <body>
 
-<div class="overlay"></div>
-
-<div class="container content">
-<div class="row justify-content-center">
-<div class="col-md-4">
-
-<div class="form-box">
+<div class="box shadow">
 
 <h3 class="text-center mb-4">Register</h3>
+
+<?php if(isset($error)){ ?>
+<div class="alert alert-danger"><?php echo $error; ?></div>
+<?php } ?>
 
 <form method="POST">
 
@@ -89,15 +55,10 @@ body{
 <option value="owner">Owner</option>
 </select>
 
-<button type="submit" name="register" class="btn btn-light w-100">
-Register
-</button>
+<button type="submit" name="register" class="btn btn-dark w-100">Register</button>
 
 </form>
 
-</div>
-</div>
-</div>
 </div>
 
 </body>

@@ -1,190 +1,191 @@
 <?php
-session_start();
 include("includes/db.php");
-
-$query = "SELECT * FROM cities";
-$result = mysqli_query($conn, $query);
+$cities=mysqli_query($conn,"SELECT * FROM cities");
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
-<title>Saanidhya - Find Your Stay</title>
-
+<title>Saanidhya</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
-body, html {
-    height: 100%;
-    margin: 0;
-    font-family: 'Segoe UI', sans-serif;
+body{
+margin:0;
+font-family:'Segoe UI',sans-serif;
+background:url('https://images.unsplash.com/photo-1522708323590-d24dbb6b0267') no-repeat center/cover;
+color:white;
 }
 
-.bg-image {
-    background: url('https://images.unsplash.com/photo-1522708323590-d24dbb6b0267') no-repeat center center/cover;
-    height: 100%;
-    position: fixed;
-    width: 100%;
-    z-index: -2;
+.overlay{
+position:fixed;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.6);
+backdrop-filter:blur(6px);
+z-index:1;
 }
 
-.overlay {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    backdrop-filter: blur(6px);
-    background: rgba(0, 0, 0, 0.5);
-    z-index: -1;
+.content{
+position:relative;
+z-index:2;
 }
 
-.hero {
-    min-height: 50vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    text-align: center;
+.hero{
+min-height:60vh;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+text-align:center;
 }
 
-.hero h1 {
-    font-weight: bold;
-    text-shadow: 2px 2px 15px rgba(0,0,0,0.6);
+.search-box{
+width:50%;
 }
 
-#dynamicSubheading {
-    transition: opacity 0.5s ease;
+.glass{
+background:rgba(255,255,255,0.12);
+backdrop-filter:blur(12px);
+border-radius:15px;
+padding:25px;
 }
 
-.city-card {
-    border-radius: 20px;
-    transition: 0.3s;
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(10px);
-    color: white;
-    border: 1px solid rgba(255,255,255,0.2);
-}
-
-.city-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-}
-
-.btn-custom {
-    background: linear-gradient(45deg, #ffffff, #e6e6e6);
-    color: black;
-    font-weight: 600;
-    border-radius: 30px;
-    padding: 10px 25px;
-    transition: 0.3s;
-}
-
-.btn-custom:hover {
-    background: linear-gradient(45deg, #000000, #333333);
-    color: white;
+.footer{
+background:rgba(0,0,0,0.8);
+backdrop-filter:blur(8px);
+padding:40px 0;
 }
 </style>
+
 </head>
 
 <body>
 
-<div class="bg-image"></div>
 <div class="overlay"></div>
 
+<div class="content">
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-transparent">
-  <div class="container">
-    <a class="navbar-brand fw-bold text-white" href="#">Saanidhya</a>
+<div class="hero">
 
-    <div>
-        <?php if(isset($_SESSION['user_id'])) { ?>
+<h1 id="mainText">Find Your Perfect Stay</h1>
+<p id="subText">Safe & Verified Rooms for Students</p>
 
-            <span class="text-white me-3">
-                Welcome, <?php echo $_SESSION['name']; ?>
-            </span>
+<div class="search-box mt-3">
+<input type="text" class="form-control mb-2" placeholder="Search by area or city">
+<button class="btn btn-light w-100">Search</button>
+</div>
 
-            <a href="logout.php" class="btn btn-outline-light">Logout</a>
+<div class="container mt-4">
 
-        <?php } else { ?>
+<h4 class="mb-3">Explore Cities</h4>
 
-            <a href="login.php" class="btn btn-outline-light me-2">Login</a>
-            <a href="register.php" class="btn btn-light">Register</a>
+<div class="row justify-content-center">
 
-        <?php } ?>
-    </div>
-  </div>
-</nav>
+<?php while($city=mysqli_fetch_assoc($cities)){ ?>
 
+<div class="col-md-3 m-2">
+<div class="glass text-center">
+<h5><?php echo $city['city_name']; ?></h5>
+<a href="city.php?city_id=<?php echo $city['id']; ?>" class="btn btn-light w-100 mt-2">Explore</a>
+</div>
+</div>
+
+<?php } ?>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="container text-center mt-4">
+
+<h4 class="mb-3">Get Started</h4>
+
+<div class="row justify-content-center">
+
+<div class="col-md-3 m-2">
+<div class="glass">
+<h5>Login</h5>
+<a href="login.php" class="btn btn-light w-100 mt-2">Go to Login</a>
+</div>
+</div>
+
+<div class="col-md-3 m-2">
+<div class="glass">
+<h5>Register</h5>
+<a href="register.php" class="btn btn-light w-100 mt-2">Create Account</a>
+</div>
+</div>
+
+</div>
+
+</div>
+
+<div class="container mt-4 text-center">
+<h4>Why Choose Saanidhya?</h4>
+
+<div class="row mt-3">
+<div class="col-md-3">✔ Verified Rooms</div>
+<div class="col-md-3">✔ Affordable</div>
+<div class="col-md-3">✔ Easy Booking</div>
+<div class="col-md-3">✔ Student Friendly</div>
+</div>
+</div>
+
+<div class="footer mt-4">
 <div class="container">
+<div class="row">
 
-  
-    <div class="hero">
-        <h1 class="display-4">Welcome to Saanidhya</h1>
+<div class="col-md-3">
+<h5>About</h5>
+<p>Safe & verified stays for students.</p>
+<p>Feels Like Home.</p>
+<p>Comfort Living Experience.</p>
+<p>Affordable Rooms Near Universities.</p>
+</div>
 
-        <p class="lead mt-3" id="dynamicSubheading">
-            Find Safe & Verified Rooms in Jalandhar & Phagwara
-        </p>
-    </div>
+<div class="col-md-3">
+<h5>Quick Links</h5>
+<a href="index.php" class="d-block text-white">Home</a>
+<a href="explore.php" class="d-block text-white">Explore</a>
+<a href="login.php" class="d-block text-white">Login</a>
+<a href="register.php" class="d-block text-white">Register</a>
+</div>
 
-    
-    <div class="row justify-content-center mb-5">
+<div class="col-md-3">
+<h5>Services</h5>
+<p>PG Finder</p>
+<p>Hostel</p>
+</div>
 
-        <?php if(mysqli_num_rows($result) > 0) { ?>
-            <?php while($row = mysqli_fetch_assoc($result)) { ?>
+<div class="col-md-3">
+<h5>Contact</h5>
+<p>Email: pandeydivakar07@gmail.com</p>
+</div>
 
-                <div class="col-md-4 mb-4">
-                    <div class="card city-card shadow-lg text-center p-4">
-                        <h3 class="fw-bold">
-                            <?php echo htmlspecialchars($row['city_name']); ?>
-                        </h3>
-
-                        <a href="explore.php?city_id=<?php echo $row['id']; ?>" 
-                           class="btn btn-custom mt-3">
-                            Explore Rooms
-                        </a>
-                    </div>
-                </div>
-
-            <?php } ?>
-        <?php } else { ?>
-
-            <div class="text-center text-white">
-                <h4>No cities available.</h4>
-            </div>
-
-        <?php } ?>
-
-    </div>
+</div>
+</div>
+</div>
 
 </div>
 
 <script>
-const messages = [
-"Find Safe & Verified Rooms in Jalandhar & Phagwara",
-"Affordable PG & Hostels Near LPU Campus",
-"Comfortable Living Spaces Designed for Students",
-"100% Owner Verified & Trusted Properties",
-"Easy Booking with Transparent Pricing",
-"Modern Amenities for Hassle-Free Living",
-"Safe & Secure Accommodation for Boys & Girls",
-"Single, Double & Triple Sharing Options Available",
-"Rooms Near Colleges, Markets & Transport",
-"Your Perfect Stay Starts with Saanidhya"
+const texts=[
+["Find Your Perfect Stay","Safe & Verified Rooms"],
+["Affordable Rooms Near You","Budget Friendly Options"],
+["Comfort Living Experience","Feel Like Home"],
+["Trusted Student Housing","Secure & Verified"]
 ];
 
-let index = 0;
-const textElement = document.getElementById("dynamicSubheading");
+let i=0;
 
-setInterval(() => {
-    textElement.style.opacity = 0;
-
-    setTimeout(() => {
-        index = (index + 1) % messages.length;
-        textElement.innerText = messages[index];
-        textElement.style.opacity = 1;
-    }, 500);
-
-}, 8000);
+setInterval(()=>{
+i=(i+1)%texts.length;
+document.getElementById("mainText").innerText=texts[i][0];
+document.getElementById("subText").innerText=texts[i][1];
+},8000);
 </script>
 
 </body>

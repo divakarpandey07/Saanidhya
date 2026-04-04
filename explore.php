@@ -1,45 +1,45 @@
 <?php
 include("includes/db.php");
 
-$query = "SELECT rooms.*, cities.city_name, room_images.image_path
-          FROM rooms
-          LEFT JOIN cities ON rooms.city_id = cities.id
-          LEFT JOIN room_images ON rooms.id = room_images.room_id
-          ORDER BY rooms.id DESC";
+$price=isset($_GET['price'])?$_GET['price']:'';
 
-$result = mysqli_query($conn, $query);
+$query="SELECT rooms.*,cities.city_name,room_images.image_path
+FROM rooms
+JOIN cities ON rooms.city_id=cities.id
+LEFT JOIN room_images ON rooms.id=room_images.room_id
+WHERE rooms.is_verified='yes'";
+
+if($price!=''){
+$query.=" AND rooms.price<=$price";
+}
+
+$query.=" GROUP BY rooms.id";
+
+$rooms=mysqli_query($conn,$query);
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
-<title>Explore Rooms - Saanidhya</title>
+<title>Explore</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
 body{
-    background: url('https://images.unsplash.com/photo-1522708323590-d24dbb6b0267') no-repeat center center/cover;
-    min-height:100vh;
+background:url('https://images.unsplash.com/photo-1493809842364-78817add7ffb') no-repeat center/cover;
+color:white;
 }
 .overlay{
-    position:fixed;
-    width:100%;
-    height:100%;
-    backdrop-filter:blur(6px);
-    background:rgba(0,0,0,0.6);
+position:fixed;width:100%;height:100%;
+background:rgba(0,0,0,0.6);
+backdrop-filter:blur(6px);
 }
-.content{
-    position:relative;
-    z-index:2;
-    padding-top:80px;
-    color:white;
-}
-.card{
-    border-radius:15px;
-}
-img{
-    height:200px;
-    object-fit:cover;
+.content{position:relative;z-index:2;}
+.glass{
+background:rgba(255,255,255,0.1);
+backdrop-filter:blur(10px);
+padding:20px;
+border-radius:15px;
 }
 </style>
 </head>
@@ -48,38 +48,42 @@ img{
 
 <div class="overlay"></div>
 
-<div class="container content">
+<div class="container content mt-4">
 
-<h2 class="text-center mb-5">Available Rooms</h2>
+<h3 class="text-center mb-4">Explore Rooms</h3>
 
+<!-- FILTER -->
+<form method="GET" class="glass mb-4">
 <div class="row">
+<div class="col-md-4">
+<input type="number" name="price" placeholder="Max Price" class="form-control" value="<?php echo $price; ?>">
+</div>
+<div class="col-md-4">
+<button class="btn btn-light w-100">Apply Filter</button>
+</div>
+</div>
+</form>
 
-<?php while($room = mysqli_fetch_assoc($result)){ ?>
+<div class="row justify-content-center">
 
-<div class="col-md-4 mb-4">
-<div class="card">
+<?php while($r=mysqli_fetch_assoc($rooms)){ ?>
 
-<?php if($room['image_path']){ ?>
-<img src="<?php echo $room['image_path']; ?>" class="card-img-top">
+<div class="col-md-3 m-2">
+<div class="glass">
+<img src="<?php echo $r['image_path']; ?>" class="w-100 mb-2" style="height:150px;object-fit:cover;">
+<h5><?php echo $r['title']; ?></h5>
+<p><?php echo $r['city_name']; ?></p>
+<p>₹<?php echo $r['price']; ?></p>
+<a href="room_details.php?id=<?php echo $r['id']; ?>" class="btn btn-light w-100">View</a>
+</div>
+</div>
+
 <?php } ?>
 
-<div class="card-body">
-<h5><?php echo $room['title']; ?></h5>
-<p><?php echo $room['area']; ?> - <?php echo $room['city_name']; ?></p>
-<p>₹<?php echo $room['price']; ?>/month</p>
-<p>Sharing: <?php echo $room['sharing_type']; ?></p>
-
-<a href="<?php echo $room['map_link']; ?>" target="_blank" class="btn btn-dark btn-sm">
-View on Map
-</a>
-
-</div>
-</div>
 </div>
 
-<?php } ?>
+<a href="logout.php" class="btn btn-danger mt-4">Logout</a>
 
-</div>
 </div>
 
 </body>
