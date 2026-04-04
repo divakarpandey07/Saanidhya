@@ -9,197 +9,152 @@ $cities=mysqli_query($conn,"SELECT * FROM cities");
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Saanidhya</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<style>
-body{font-family:'Segoe UI',system-ui,sans-serif;color:#1e293b;}
-.kicker{letter-spacing:.08em;}
-.hero-home{
-min-height:clamp(420px,68vh,640px);
-display:flex;
-align-items:center;
-color:#fff;
-background:
-linear-gradient(120deg,rgba(15,23,42,0.82) 0%,rgba(30,41,59,0.55) 45%,rgba(15,23,42,0.7) 100%),
-url('https://images.unsplash.com/photo-1522708323590-d24dbb6b0267') center/cover no-repeat;
-}
-.hero-home .lead{max-width:34rem;}
-.search-bar .form-control{border:0;padding:0.7rem 1rem;}
-.search-bar .btn{font-weight:600;padding:0.7rem 1.25rem;}
-.city-tile{
-border:1px solid #e2e8f0;
-transition:box-shadow .2s ease,transform .2s ease;
-}
-.city-tile:hover{box-shadow:0 12px 28px rgba(15,23,42,0.08);transform:translateY(-2px);}
-.step-num{
-width:2.25rem;height:2.25rem;border-radius:50%;
-background:#0f172a;color:#fff;
-font-weight:600;font-size:.9rem;
-display:inline-flex;align-items:center;justify-content:center;
-}
-footer a{color:rgba(255,255,255,0.78);text-decoration:none;}
-footer a:hover{color:#fff;text-decoration:underline;}
-</style>
+<?php include __DIR__."/includes/tailwind.php"; ?>
 </head>
-<body class="bg-light">
+<body class="bg-slate-50 font-sans text-slate-800 antialiased">
 
-<nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top shadow-sm">
-<div class="container py-1">
-<a class="navbar-brand fw-semibold text-dark" href="index.php">Saanidhya</a>
-<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain" aria-controls="navMain" aria-expanded="false" aria-label="Toggle navigation">
-<span class="navbar-toggler-icon"></span>
-</button>
-<div class="collapse navbar-collapse" id="navMain">
-<ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
-<li class="nav-item"><a class="nav-link" href="explore.php">Explore</a></li>
-<li class="nav-item"><a class="nav-link" href="login.php">Login</a></li>
-<li class="nav-item"><a class="btn btn-dark btn-sm px-3 mt-2 mt-lg-0" href="register.php">Register</a></li>
-</ul>
+<nav class="sticky top-0 z-50 border-b border-slate-200 bg-white shadow-sm">
+<div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-3">
+<a class="font-semibold text-slate-900" href="index.php">Saanidhya</a>
+<div class="flex flex-wrap items-center gap-4 text-sm">
+<a class="text-slate-600 hover:text-slate-900" href="explore.php">Explore</a>
+<a class="text-slate-600 hover:text-slate-900" href="login.php">Login</a>
+<a class="rounded-lg bg-slate-900 px-3 py-1.5 font-medium text-white hover:bg-slate-800" href="register.php">Register</a>
 </div>
 </div>
 </nav>
 
-<header class="hero-home">
-<div class="container py-5">
-<div class="row align-items-center">
-<div class="col-lg-7">
-<p class="kicker text-white-50 text-uppercase small mb-2">Student housing</p>
-<h1 class="display-5 fw-bold mb-3">Rooms that feel closer to campus and closer to home.</h1>
-<p class="lead mb-4">Browse verified PGs and hostels in the cities we cover. Pick an area, compare options, and book with confidence.</p>
-<form class="search-bar bg-white rounded-3 shadow p-2" action="explore.php" method="get">
-<div class="row g-2 align-items-stretch">
-<div class="col-md-8">
-<label class="visually-hidden" for="q">Search</label>
-<input id="q" name="q" type="search" class="form-control rounded-2" placeholder="Search by city, area, or landmark" autocomplete="off">
-</div>
-<div class="col-md-4 d-grid">
-<button type="submit" class="btn btn-dark rounded-2">Search rooms</button>
-</div>
+<header class="relative flex min-h-[clamp(420px,68vh,640px)] items-center bg-cover bg-center text-white" style="background-image:linear-gradient(120deg,rgba(15,23,42,0.82) 0%,rgba(30,41,59,0.55) 45%,rgba(15,23,42,0.7) 100%),url('https://images.unsplash.com/photo-1522708323590-d24dbb6b0267');">
+<div class="mx-auto w-full max-w-7xl px-4 py-12 md:py-16">
+<div class="max-w-2xl">
+<p class="mb-2 text-xs font-medium uppercase tracking-wider text-white/60">Student housing</p>
+<h1 class="mb-3 text-3xl font-bold md:text-4xl" id="mainText">Rooms that feel closer to campus and closer to home.</h1>
+<p class="mb-6 max-w-xl text-lg text-white" id="subText">Browse verified PGs and hostels in the cities we cover. Pick an area, compare options, and book with confidence.</p>
+<form class="rounded-xl bg-white p-2 shadow-lg" action="explore.php" method="get">
+<div class="flex flex-col gap-2 sm:flex-row sm:items-stretch">
+<label class="sr-only" for="q">Search</label>
+<input id="q" name="q" type="search" class="min-w-0 flex-1 rounded-lg border-0 px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-slate-900/20" placeholder="Search by city, area, or landmark" autocomplete="off">
+<button type="submit" class="shrink-0 rounded-lg bg-slate-900 px-6 py-3 font-semibold text-white hover:bg-slate-800">Search rooms</button>
 </div>
 </form>
-</div>
 </div>
 </div>
 </header>
 
 <main>
-<section class="py-5">
-<div class="container">
-<div class="row justify-content-between align-items-end mb-4">
-<div class="col-md-8">
-<h2 class="h3 fw-semibold mb-2">Browse by city</h2>
-<p class="text-secondary mb-0">Choose a city to see listings, filters, and map-friendly details.</p>
+<section class="py-12 md:py-16">
+<div class="mx-auto max-w-7xl px-4">
+<div class="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+<div>
+<h2 class="text-2xl font-semibold text-slate-900">Browse by city</h2>
+<p class="mt-1 text-slate-600">Choose a city to see listings, filters, and map-friendly details.</p>
 </div>
-<div class="col-md-4 text-md-end mt-3 mt-md-0">
-<a class="btn btn-outline-dark" href="explore.php">View all listings</a>
+<a class="inline-flex shrink-0 items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-900 hover:bg-slate-50" href="explore.php">View all listings</a>
 </div>
-</div>
-<div class="row g-4">
+<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
 <?php while($city=mysqli_fetch_assoc($cities)){ ?>
-<div class="col-sm-6 col-lg-4 col-xl-3">
-<div class="card city-tile h-100 rounded-4 overflow-hidden bg-white">
-<div class="card-body d-flex flex-column p-4">
-<h3 class="h5 card-title mb-1"><?php echo htmlspecialchars($city['city_name']); ?></h3>
-<p class="small text-secondary flex-grow-1 mb-3">Rooms and hostels in this city.</p>
-<a class="btn btn-dark mt-auto align-self-start" href="city.php?city_id=<?php echo (int)$city['id']; ?>">Open city</a>
-</div>
-</div>
+<div class="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+<h3 class="text-lg font-semibold text-slate-900"><?php echo htmlspecialchars($city['city_name']); ?></h3>
+<p class="mt-1 text-sm text-slate-600">Rooms and hostels in this city.</p>
+<a class="mt-4 inline-flex rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800" href="city.php?city_id=<?php echo (int)$city['id']; ?>">Open city</a>
 </div>
 <?php } ?>
 </div>
 </div>
 </section>
 
-<section class="py-5 bg-white border-top border-bottom">
-<div class="container">
-<div class="row justify-content-center text-center mb-5">
-<div class="col-lg-8">
-<h2 class="h3 fw-semibold mb-3">Why students use Saanidhya</h2>
-<p class="text-secondary mb-0">Less guesswork before you move — verified owners, clear expectations, and booking flows built for busy semesters.</p>
+<section class="border-y border-slate-200 bg-white py-12 md:py-16">
+<div class="mx-auto max-w-7xl px-4">
+<div class="mx-auto mb-10 max-w-2xl text-center">
+<h2 class="text-2xl font-semibold text-slate-900">Why students use Saanidhya</h2>
+<p class="mt-2 text-slate-600">Less guesswork before you move — verified owners, clear expectations, and booking flows built for busy semesters.</p>
 </div>
+<div class="grid gap-6 md:grid-cols-3">
+<div class="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+<span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-900 text-sm font-semibold text-white">1</span>
+<h3 class="mt-3 font-semibold text-slate-900">Verified listings</h3>
+<p class="mt-2 text-sm text-slate-600">Rooms go through checks so you are not comparing mystery posts.</p>
 </div>
-<div class="row g-4">
-<div class="col-md-4">
-<div class="p-4 h-100 rounded-4 bg-light border">
-<span class="step-num mb-3">1</span>
-<h3 class="h5 mt-2">Verified listings</h3>
-<p class="text-secondary small mb-0">Rooms go through checks so you are not comparing mystery posts.</p>
+<div class="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+<span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-900 text-sm font-semibold text-white">2</span>
+<h3 class="mt-3 font-semibold text-slate-900">Built for budgets</h3>
+<p class="mt-2 text-sm text-slate-600">Student-friendly options with transparent details upfront.</p>
 </div>
-</div>
-<div class="col-md-4">
-<div class="p-4 h-100 rounded-4 bg-light border">
-<span class="step-num mb-3">2</span>
-<h3 class="h5 mt-2">Built for budgets</h3>
-<p class="text-secondary small mb-0">Student-friendly options with transparent details upfront.</p>
-</div>
-</div>
-<div class="col-md-4">
-<div class="p-4 h-100 rounded-4 bg-light border">
-<span class="step-num mb-3">3</span>
-<h3 class="h5 mt-2">Simple booking</h3>
-<p class="text-secondary small mb-0">Request a room, track status, and manage stays from your dashboard.</p>
-</div>
+<div class="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+<span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-900 text-sm font-semibold text-white">3</span>
+<h3 class="mt-3 font-semibold text-slate-900">Simple booking</h3>
+<p class="mt-2 text-sm text-slate-600">Request a room, track status, and manage stays from your dashboard.</p>
 </div>
 </div>
 </div>
 </section>
 
-<section class="py-5">
-<div class="container">
-<h2 class="h3 fw-semibold text-center mb-4">Get started</h2>
-<div class="row g-4 justify-content-center">
-<div class="col-md-5 col-lg-4">
-<div class="card h-100 rounded-4 shadow-sm border-0">
-<div class="card-body p-4 d-flex flex-column">
-<h3 class="h5">Already have an account?</h3>
-<p class="text-secondary small flex-grow-1">Log in to manage bookings, wishlists, and notifications.</p>
-<a class="btn btn-outline-dark" href="login.php">Login</a>
+<section class="py-12 md:py-16">
+<div class="mx-auto max-w-7xl px-4">
+<h2 class="mb-8 text-center text-2xl font-semibold text-slate-900">Get started</h2>
+<div class="mx-auto grid max-w-3xl gap-6 md:grid-cols-2">
+<div class="flex flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+<h3 class="font-semibold text-slate-900">Already have an account?</h3>
+<p class="mt-2 flex-1 text-sm text-slate-600">Log in to manage bookings, wishlists, and notifications.</p>
+<a class="mt-4 inline-flex justify-center rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-white bg-slate-900 hover:bg-slate-800" href="login.php">Login</a>
 </div>
-</div>
-</div>
-<div class="col-md-5 col-lg-4">
-<div class="card h-100 rounded-4 shadow-sm border-0">
-<div class="card-body p-4 d-flex flex-column">
-<h3 class="h5">New here?</h3>
-<p class="text-secondary small flex-grow-1">Create a free account to save rooms and send booking requests.</p>
-<a class="btn btn-dark" href="register.php">Create account</a>
-</div>
-</div>
+<div class="flex flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+<h3 class="font-semibold text-slate-900">New here?</h3>
+<p class="mt-2 flex-1 text-sm text-slate-600">Create a free account to save rooms and send booking requests.</p>
+<a class="mt-4 inline-flex justify-center rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800" href="register.php">Create account</a>
 </div>
 </div>
 </div>
 </section>
 </main>
 
-<footer class="bg-dark text-white py-5 mt-auto">
-<div class="container">
-<div class="row g-4">
-<div class="col-md-4">
-<h3 class="h6 text-white-50 text-uppercase small mb-3">About</h3>
-<p class="small mb-2">Safe and verified stays for students.</p>
-<p class="small mb-0 text-secondary">Comfortable living near universities.</p>
+<footer class="bg-slate-900 py-12 text-white">
+<div class="mx-auto max-w-7xl px-4">
+<div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+<div>
+<h3 class="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400">About</h3>
+<p class="text-sm text-slate-300">Safe and verified stays for students.</p>
+<p class="mt-2 text-sm text-slate-500">Comfortable living near universities.</p>
 </div>
-<div class="col-md-2">
-<h3 class="h6 text-white-50 text-uppercase small mb-3">Links</h3>
-<a class="d-block small py-1" href="index.php">Home</a>
-<a class="d-block small py-1" href="explore.php">Explore</a>
-<a class="d-block small py-1" href="login.php">Login</a>
-<a class="d-block small py-1" href="register.php">Register</a>
-</div>
-<div class="col-md-3">
-<h3 class="h6 text-white-50 text-uppercase small mb-3">Services</h3>
-<p class="small mb-1">PG finder</p>
-<p class="small mb-0">Hostel listings</p>
-</div>
-<div class="col-md-3">
-<h3 class="h6 text-white-50 text-uppercase small mb-3">Contact</h3>
-<p class="small mb-0">pandeydivakar07@gmail.com</p>
+<div>
+<h3 class="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400">Links</h3>
+<div class="flex flex-col gap-2 text-sm">
+<a class="text-slate-300 hover:text-white hover:underline" href="index.php">Home</a>
+<a class="text-slate-300 hover:text-white hover:underline" href="explore.php">Explore</a>
+<a class="text-slate-300 hover:text-white hover:underline" href="login.php">Login</a>
+<a class="text-slate-300 hover:text-white hover:underline" href="register.php">Register</a>
 </div>
 </div>
-<hr class="border-secondary my-4 opacity-25">
-<p class="small text-secondary mb-0 text-center">Saanidhya</p>
+<div>
+<h3 class="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400">Services</h3>
+<p class="text-sm text-slate-300">PG finder</p>
+<p class="text-sm text-slate-300">Hostel listings</p>
+</div>
+<div>
+<h3 class="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400">Contact</h3>
+<p class="text-sm text-slate-300">pandeydivakar07@gmail.com</p>
+<p class="text-sm text-slate-300">akashbauri4702@gmail.com</p>
+</div>
+</div>
+<hr class="my-8 border-slate-700">
+<p class="text-center text-sm text-slate-500">Saanidhya</p>
 </div>
 </footer>
+<script>
+const texts=[
+["Find Your Perfect Stay","Safe & Verified Rooms"],
+["Affordable Rooms Near You","Budget Friendly Options"],
+["Comfort Living Experience","Feel Like Home"],
+["Trusted Student Housing","Secure & Verified"]
+];
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+let i=0;
+
+setInterval(()=>{
+i=(i+1)%texts.length;
+document.getElementById("mainText").innerText=texts[i][0];
+document.getElementById("subText").innerText=texts[i][1];
+},8000);
+</script>
 </body>
 </html>
