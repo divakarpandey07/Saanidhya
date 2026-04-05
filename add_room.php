@@ -125,7 +125,7 @@ exit();
 
 <div class="mx-auto mt-8 max-w-lg px-4 pb-12">
 <div class="rounded-2xl border border-white/30 bg-white/92 p-6 shadow-xl backdrop-blur md:p-8">
-<h1 class="mb-6 text-center text-2xl font-semibold">Add room</h1>
+<h1 class="mb-6 text-center text-2xl text-white font-semibold">Add Room</h1>
 
 <?php if($error!==''){ ?>
 <div class="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950"><?php echo htmlspecialchars($error); ?></div>
@@ -175,7 +175,7 @@ $cities=mysqli_query($conn,"SELECT * FROM cities");
 <option value="no" <?php echo (isset($_POST['geyser'])&&$_POST['geyser']==='no')?'selected':''; ?>>No geyser</option>
 </select>
 
-<input type="file" name="image" accept="image/jpeg,image/png,image/gif,image/webp" class="w-full text-sm text-slate-600 file:mr-4 file:rounded-lg file:border-0 file:bg-slate-100 file:px-4 file:py-2 file:font-medium file:text-slate-900 hover:file:bg-slate-200">
+<input type="file" name="image" accept="image/jpeg,image/png,image/gif,image/webp" class="w-full text-sm text-white file:mr-4 file:rounded-lg file:border-0 file:bg-slate-100 file:px-4 file:py-2 file:font-medium file:text-slate-900 hover:file:bg-slate-200">
 
 <button type="submit" class="w-full rounded-lg bg-slate-900 py-3 font-semibold text-white hover:bg-slate-800">Add room</button>
 
