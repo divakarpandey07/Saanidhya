@@ -37,25 +37,87 @@ $error="Admin not found";
 <head>
 <title>Admin Login</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
 <style>
-body{background:#f5f5f5;}
-.box{max-width:400px;margin:100px auto;padding:30px;background:white;border-radius:10px;}
+
+body{
+margin:0;
+padding:0;
+font-family:sans-serif;
+overflow:hidden;
+}
+
+.bg{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:url('https://images.unsplash.com/photo-1505691938895-1758d7feb511') no-repeat center/cover;
+filter: blur(8px);
+z-index:-2;
+}
+
+.overlay{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.4);
+z-index:-1;
+}
+
+.box{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+width:360px;
+padding:30px;
+background:rgba(255,255,255,0.15);
+border-radius:15px;
+backdrop-filter:blur(10px);
+box-shadow:0 8px 32px rgba(0,0,0,0.3);
+color:white;
+text-align:center;
+}
+
+input{
+background:rgba(255,255,255,0.85) !important;
+border:none !important;
+}
+
+button{
+background:white !important;
+color:black !important;
+font-weight:bold;
+}
+
 </style>
+
 </head>
+
 <body>
 
-<div class="box shadow">
-<h3 class="text-center mb-4">Admin Login</h3>
+<div class="bg"></div>
+
+<div class="overlay"></div>
+
+<div class="box">
+
+<h3 class="mb-4">Admin Login</h3>
 
 <?php if(isset($error)){ ?>
 <div class="alert alert-danger"><?php echo $error; ?></div>
 <?php } ?>
 
 <form method="POST">
-<input type="email" name="email" class="form-control mb-3" placeholder="Email" required>
+<input type="email" name="email" class="form-control mb-3" placeholder="Admin Email" required>
 <input type="password" name="password" class="form-control mb-3" placeholder="Password" required>
-<button class="btn btn-dark w-100">Login</button>
+<button class="btn w-100">Login</button>
 </form>
+
 </div>
 
 </body>

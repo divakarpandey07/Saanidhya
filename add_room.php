@@ -3,186 +3,203 @@ session_start();
 include("includes/db.php");
 
 if(!isset($_SESSION['user_id']) || $_SESSION['role']!='owner'){
-header("Location: login.php");
-exit();
+    header("Location: login.php");
+    exit();
 }
 
-$error='';
+if($_SERVER["REQUEST_METHOD"]=="POST"){
 
-if($_SERVER["REQUEST_METHOD"]==="POST"){
+$owner_id = $_SESSION['user_id'];
 
-$owner_id=(int)$_SESSION['user_id'];
-$city_id=isset($_POST['city_id'])?(int)$_POST['city_id']:0;
-$title=isset($_POST['title'])?trim($_POST['title']):'';
-$price=isset($_POST['price'])?(int)$_POST['price']:0;
-$description=isset($_POST['description'])?trim($_POST['description']):'';
-$address=isset($_POST['address'])?trim($_POST['address']):'';
-$property_type=isset($_POST['property_type'])?trim($_POST['property_type']):'';
-$guests=isset($_POST['guests'])&&$_POST['guests']!==''?trim($_POST['guests']):'';
-$wifi=isset($_POST['wifi'])?$_POST['wifi']:'no';
-$ac=isset($_POST['ac'])?$_POST['ac']:'no';
-$geyser=isset($_POST['geyser'])?$_POST['geyser']:'no';
+$city_id = $_POST['city_id'];
+$title = $_POST['title'];
+$price = $_POST['price'];
+$description = $_POST['description'];
+$address = $_POST['address'];
+$property_type = $_POST['property_type'];
+$guests = $_POST['guests'];
+$wifi = $_POST['wifi'];
+$ac = $_POST['ac'];
+$geyser = $_POST['geyser'];
 
-$area=function_exists('mb_substr')?mb_substr($address,0,150):substr($address,0,150);
-$ac_available=($ac==='yes')?'yes':'no';
+$stmt = $conn->prepare("INSERT INTO rooms(owner_id,city_id,title,description,price,address,property_type,guests,wifi,ac,geyser,is_verified) VALUES(?,?,?,?,?,?,?,?,?,?,?,'no')");
+$stmt->bind_param("iissssissss",$owner_id,$city_id,$title,$description,$price,$address,$property_type,$guests,$wifi,$ac,$geyser);
+$stmt->execute();
 
-$extra=[];
-if($property_type!==''){$extra[]='Type: '.$property_type;}
-if($guests!==''){$extra[]='Guests: '.$guests;}
-if($wifi!==''){$extra[]='WiFi: '.$wifi;}
-if($geyser!==''){$extra[]='Geyser: '.$geyser;}
-if($extra){
-$description=$description===''?implode(' | ',$extra):$description."\n\n".implode(' | ',$extra);
-}
-
-if($city_id<=0){
-$error='Please select a city.';
-}elseif($title===''){
-$error='Please enter a title.';
-}elseif($price<=0){
-$error='Please enter a valid price.';
-}else{
-
-$hasVerified=false;
-$colCheck=$conn->query("SHOW COLUMNS FROM rooms LIKE 'is_verified'");
-if($colCheck){
-$hasVerified=$colCheck->num_rows>0;
-$colCheck->free();
-}
-
-$sql="INSERT INTO rooms (owner_id,city_id,title,description,area,price,ac_available";
-if($hasVerified){
-$sql.=",is_verified";
-}
-$sql.=") VALUES (?,?,?,?,?,?,?";
-if($hasVerified){
-$sql.=",'no'";
-}
-$sql.=")";
-
-$stmt=$conn->prepare($sql);
-if(!$stmt){
-$error='Could not prepare: '.$conn->error;
-}else{
-$stmt->bind_param("iisssis",$owner_id,$city_id,$title,$description,$area,$price,$ac_available);
-if(!$stmt->execute()){
-$error='Could not save room: '.$stmt->error;
-$stmt->close();
-}else{
-$room_id=(int)$conn->insert_id;
-$stmt->close();
+$room_id = $stmt->insert_id;
 
 if(!empty($_FILES['image']['name'])){
-if(isset($_FILES['image']['error'])&&$_FILES['image']['error']===UPLOAD_ERR_OK&&is_uploaded_file($_FILES['image']['tmp_name'])){
-$uploadDir=__DIR__.'/uploads';
-if(!is_dir($uploadDir)){
-mkdir($uploadDir,0755,true);
-}
-$ext=strtolower(pathinfo($_FILES['image']['name'],PATHINFO_EXTENSION));
-$allowed=['jpg','jpeg','png','gif','webp'];
-if(in_array($ext,$allowed,true)){
-$safe='room_'.$room_id.'_'.bin2hex(random_bytes(8)).'.'.$ext;
-$path='uploads/'.$safe;
-if(move_uploaded_file($_FILES['image']['tmp_name'],$uploadDir.'/'.$safe)){
-$ins=$conn->prepare("INSERT INTO room_images(room_id,image_path) VALUES(?,?)");
-if($ins){
-$ins->bind_param("is",$room_id,$path);
-$ins->execute();
-$ins->close();
-}
-}
-}
+
+$img = $_FILES['image']['name'];
+$tmp = $_FILES['image']['tmp_name'];
+
+$ext = strtolower(pathinfo($img, PATHINFO_EXTENSION));
+$allowed = ['jpg','jpeg','png'];
+
+if(in_array($ext,$allowed)){
+
+$new_name = time().".".$ext;
+$path = "uploads/".$new_name;
+
+move_uploaded_file($tmp,$path);
+
+$stmt2 = $conn->prepare("INSERT INTO room_images(room_id,image_path) VALUES(?,?)");
+$stmt2->bind_param("is",$room_id,$path);
+$stmt2->execute();
+
+}else{
+echo "<script>alert('Only JPG, JPEG, PNG allowed');</script>";
 }
 }
 
-if($error===''){
 header("Location: owner_dashboard.php");
 exit();
-}
-}
-}
-}
 }
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Add room</title>
-<?php include __DIR__."/includes/tailwind.php"; ?>
+<title>Add Room</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+body{
+margin:0;
+padding:0;
+background:url('https://images.unsplash.com/photo-1493809842364-78817add7ffb') no-repeat center/cover;
+font-family:sans-serif;
+}
+
+.overlay{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.4);
+backdrop-filter:blur(5px);
+z-index:0;
+}
+
+.container-box{
+position:relative;
+z-index:2;
+max-width:850px;
+margin:40px auto;
+padding:35px;
+background:rgba(255,255,255,0.06);
+border-radius:20px;
+backdrop-filter:blur(15px);
+box-shadow:0 10px 40px rgba(0,0,0,0.4);
+color:white;
+}
+
+h3{
+text-align:center;
+margin-bottom:25px;
+font-weight:600;
+}
+
+.form-control, .form-select{
+background:transparent !important;
+border:1px solid rgba(255,255,255,0.3) !important;
+color:white !important;
+padding:12px !important;
+border-radius:10px !important;
+}
+
+.form-control::placeholder{
+color:rgba(255,255,255,0.7);
+}
+
+.form-control:focus, .form-select:focus{
+box-shadow:none !important;
+border:1px solid white !important;
+background:transparent !important;
+}
+
+select option{
+color:black;
+}
+
+button{
+background:white !important;
+color:black !important;
+font-weight:600;
+padding:12px;
+border-radius:10px;
+transition:0.3s;
+}
+
+button:hover{
+transform:scale(1.02);
+}
+</style>
+
 </head>
-<body class="min-h-screen bg-[url('https://images.unsplash.com/photo-1522708323590-d24dbb6b0267')] bg-cover bg-center bg-fixed font-sans text-slate-800 antialiased">
-<div class="min-h-screen bg-slate-950/55">
 
-<nav class="border-b border-white/20 bg-white/85 shadow-sm backdrop-blur">
-<div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-3">
-<a class="font-semibold text-slate-900" href="index.php">Saanidhya</a>
-<a class="text-sm text-slate-700 hover:text-slate-900" href="owner_dashboard.php">Dashboard</a>
-</div>
-</nav>
+<body>
 
-<div class="mx-auto mt-8 max-w-lg px-4 pb-12">
-<div class="rounded-2xl border border-white/30 bg-white/92 p-6 shadow-xl backdrop-blur md:p-8">
-<h1 class="mb-6 text-center text-2xl text-white font-semibold">Add Room</h1>
+<div class="overlay"></div>
 
-<?php if($error!==''){ ?>
-<div class="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950"><?php echo htmlspecialchars($error); ?></div>
-<?php } ?>
+<div class="container-box">
 
-<form method="POST" enctype="multipart/form-data" class="space-y-4">
+<h3>Add Room</h3>
+
+<form method="POST" enctype="multipart/form-data">
 
 <?php
-$cities=mysqli_query($conn,"SELECT * FROM cities");
+$cities = mysqli_query($conn,"SELECT * FROM cities");
 ?>
 
-<select name="city_id" class="w-full rounded-lg border border-slate-300 px-4 py-3 text-slate-900 focus:border-slate-900 focus:ring-1 focus:ring-slate-900" required>
-<option value="">Select city</option>
+<select name="city_id" class="form-select mb-3" required>
+<option value="">Select City</option>
 <?php while($c=mysqli_fetch_assoc($cities)){ ?>
-<option value="<?php echo (int)$c['id']; ?>"><?php echo htmlspecialchars($c['city_name']); ?></option>
+<option value="<?php echo $c['id']; ?>">
+<?php echo $c['city_name']; ?>
+</option>
 <?php } ?>
 </select>
 
-<input type="text" name="title" class="w-full rounded-lg border border-slate-300 px-4 py-3 text-slate-900 focus:border-slate-900 focus:ring-1 focus:ring-slate-900" placeholder="Title" required value="<?php echo isset($_POST['title'])?htmlspecialchars($_POST['title']):''; ?>">
+<input type="text" name="title" class="form-control mb-3" placeholder="Room Title" required>
 
-<textarea name="description" class="w-full rounded-lg border border-slate-300 px-4 py-3 text-slate-900 focus:border-slate-900 focus:ring-1 focus:ring-slate-900" rows="3" placeholder="Description"><?php echo isset($_POST['description'])?htmlspecialchars($_POST['description']):''; ?></textarea>
+<textarea name="description" class="form-control mb-3" placeholder="Description"></textarea>
 
-<input type="number" name="price" min="1" step="1" class="w-full rounded-lg border border-slate-300 px-4 py-3 text-slate-900 focus:border-slate-900 focus:ring-1 focus:ring-slate-900" placeholder="Price" required value="<?php echo isset($_POST['price'])?htmlspecialchars((string)(int)$_POST['price']):''; ?>">
+<input type="number" name="price" class="form-control mb-3" placeholder="Price (₹)" required>
 
-<input type="text" name="address" class="w-full rounded-lg border border-slate-300 px-4 py-3 text-slate-900 focus:border-slate-900 focus:ring-1 focus:ring-slate-900" placeholder="Address / area" value="<?php echo isset($_POST['address'])?htmlspecialchars($_POST['address']):''; ?>">
+<input type="text" name="address" class="form-control mb-3" placeholder="Address">
 
-<select name="property_type" class="w-full rounded-lg border border-slate-300 px-4 py-3 text-slate-900 focus:border-slate-900 focus:ring-1 focus:ring-slate-900">
-<option value="PG" <?php echo (!isset($_POST['property_type'])||$_POST['property_type']==='PG')?'selected':''; ?>>PG</option>
-<option value="Hostel" <?php echo (isset($_POST['property_type'])&&$_POST['property_type']==='Hostel')?'selected':''; ?>>Hostel</option>
-<option value="Flat" <?php echo (isset($_POST['property_type'])&&$_POST['property_type']==='Flat')?'selected':''; ?>>Flat</option>
+<select name="property_type" class="form-select mb-3">
+<option value="PG">PG</option>
+<option value="Hostel">Hostel</option>
+<option value="Flat">Flat</option>
 </select>
 
-<input type="number" name="guests" min="0" step="1" class="w-full rounded-lg border border-slate-300 px-4 py-3 text-slate-900 focus:border-slate-900 focus:ring-1 focus:ring-slate-900" placeholder="Guests" value="<?php echo isset($_POST['guests'])?htmlspecialchars((string)$_POST['guests']):''; ?>">
+<input type="number" name="guests" class="form-control mb-3" placeholder="Guests">
 
-<select name="wifi" class="w-full rounded-lg border border-slate-300 px-4 py-3 text-slate-900 focus:border-slate-900 focus:ring-1 focus:ring-slate-900">
-<option value="yes" <?php echo (!isset($_POST['wifi'])||$_POST['wifi']==='yes')?'selected':''; ?>>WiFi available</option>
-<option value="no" <?php echo (isset($_POST['wifi'])&&$_POST['wifi']==='no')?'selected':''; ?>>No WiFi</option>
+<select name="wifi" class="form-select mb-3">
+<option value="yes">WiFi Available</option>
+<option value="no">No WiFi</option>
 </select>
 
-<select name="ac" class="w-full rounded-lg border border-slate-300 px-4 py-3 text-slate-900 focus:border-slate-900 focus:ring-1 focus:ring-slate-900">
-<option value="yes" <?php echo (!isset($_POST['ac'])||$_POST['ac']==='yes')?'selected':''; ?>>AC available</option>
-<option value="no" <?php echo (isset($_POST['ac'])&&$_POST['ac']==='no')?'selected':''; ?>>No AC</option>
+<select name="ac" class="form-select mb-3">
+<option value="yes">AC Available</option>
+<option value="no">No AC</option>
 </select>
 
-<select name="geyser" class="w-full rounded-lg border border-slate-300 px-4 py-3 text-slate-900 focus:border-slate-900 focus:ring-1 focus:ring-slate-900">
-<option value="yes" <?php echo (!isset($_POST['geyser'])||$_POST['geyser']==='yes')?'selected':''; ?>>Geyser available</option>
-<option value="no" <?php echo (isset($_POST['geyser'])&&$_POST['geyser']==='no')?'selected':''; ?>>No geyser</option>
+<select name="geyser" class="form-select mb-3">
+<option value="yes">Geyser Available</option>
+<option value="no">No Geyser</option>
 </select>
 
-<input type="file" name="image" accept="image/jpeg,image/png,image/gif,image/webp" class="w-full text-sm text-white file:mr-4 file:rounded-lg file:border-0 file:bg-slate-100 file:px-4 file:py-2 file:font-medium file:text-slate-900 hover:file:bg-slate-200">
+<input type="file" name="image" accept="image/*" class="form-control mb-3" required>
 
-<button type="submit" class="w-full rounded-lg bg-slate-900 py-3 font-semibold text-white hover:bg-slate-800">Add room</button>
+<button class="btn w-100">Add Room</button>
 
 </form>
-</div>
-</div>
 
 </div>
+
 </body>
 </html>
