@@ -123,10 +123,19 @@ if (isset($_POST['register'])) {
 <script>
 function validateForm() {
     var name = document.getElementById('name').value;
-    if (/[0-9]/.test(name) && /[a-zA-Z]/.test(name)) {
-        alert("Name cannot contain numbers along with letters.");
+    var email = document.querySelector('input[name="email"]').value;
+    
+    if (/[0-9]/.test(name)) {
+        alert("Name cannot contain numbers.");
         return false;
     }
+    
+    var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(email)) {
+        alert("Please enter a valid email address.");
+        return false;
+    }
+    
     return true;
 }
 </script>
