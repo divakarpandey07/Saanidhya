@@ -1,4 +1,5 @@
 <?php
+session_start();
 include("includes/db.php");
 
 $price=isset($_GET['price'])?$_GET['price']:'';
@@ -23,6 +24,7 @@ $rooms=mysqli_query($conn,$query);
 <head>
 <title>Explore</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <?php include __DIR__."/includes/tailwind.php"; ?>
 <style>
 body{
@@ -47,19 +49,20 @@ border-radius:15px;
 <body>
 
 <nav class="sticky top-0 z-50 border-b border-slate-200 bg-white shadow-sm">
+<nav class="sticky top-0 z-50 border-b border-slate-200 bg-white shadow-sm">
 <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-3">
-<a class="font-semibold text-slate-900" href="index.php" class="h-8"><img class="h-12" src="./assets/logo.png" alt="Saanidhya"></a>
+<a class="font-semibold text-slate-900" href="index.php"><img class="h-12" src="./assets/logo.png" alt="Saanidhya"></a>
 <div class="flex flex-wrap items-center gap-4 text-lg">
 <a class="text-[#1d405c] hover:text-slate-900" href="explore.php">Explore</a>
 <a class="text-[#1d405c] hover:text-slate-900" href="#">PG Finder</a>
 <a class="text-[#1d405c] hover:text-slate-900" href="#">Hostel Listing</a>
-<p class="text-[#1d405c] hover:text-slate-900" >|</p>
+<p class="text-[#1d405c] hover:text-slate-900">|</p>
 <?php
-    if(isset($_SESSION['role'])){
+    if(isset($_SESSION['user_id'])){
         echo '
             <a class="rounded-lg bg-[#c64f4f] px-3 py-1.5 font-medium text-white hover:bg-[#ff0000a0]" href="logout.php">Logout</a>
         ';
-    }elseif (!isset($_SESSION['user_id'])){
+    } else {
         echo '
             <a class="text-[#1d405c] hover:text-slate-900" href="login.php">Login</a>
             <a class="rounded-lg bg-[#cfab71] px-3 py-1.5 font-medium text-white hover:bg-[#ba8b40]" href="register.php">Register</a>
@@ -95,13 +98,37 @@ border-radius:15px;
 <div class="glass bg-[#aaaa]">
 <img src="<?php echo $r['image_path']; ?>" class="w-100 rounded-xl mb-2" style="height:150px;object-fit:cover;">
 <div class="my-4">
-    <h2 class="bold text-xl"><?php echo $r['title']; ?></h2>
-    <p><?php echo $r['city_name']; ?></p>
-    <div class="inline-block bg-[#aaa] px-2 py-1 rounded-3xl my-2">₹<?php echo $r['price']; ?></div>
+    <h2 class="bold text-2xl font-semibold"><?php echo $r['title']; ?></h2>
+    <p class="mt-1 text-xl"><i class="fas fa-map-marker-alt text-[#cfab71] pr-1"></i>
+<?php echo $r['city_name']; ?></p>
+        <div class="my-6 flex flex-wrap gap-2 text-xs">
+            <?php if($r['ac'] == 'yes'): ?>
+                 <div class="rounded-xl py-1 px-2  bg-orange-100 text-[1rem]">
+                    <i class="fas fa-snowflake text-[#cfab71] pr-1"></i>
+                    <span class=" text-[#1d405c]">AC</span>
+                </div>           <?php endif; ?>
+            <?php if($r['wifi'] == 'yes'): ?>
+                <div class="rounded-xl py-1 px-2  bg-orange-100 text-[1rem]">
+                    <i class="fas fa-wifi text-[#cfab71] pr-1"></i>
+                    <span class=" text-[#1d405c]">WiFi</span>
+                </div>
+            <?php endif; ?>
+            <?php if($r['geyser'] == 'yes'): ?>
+                 <div class="rounded-xl py-1 px-2  bg-orange-100 text-[1rem]">
+                    <i class="fas fa-hot-tub text-[#cfab71] pr-1"></i>
+                    <span class=" text-[#1d405c]">Geyser</span>
+                </div>            <?php endif; ?>
+            <span class="rounded-full bg-orange-100 text-[1rem] px-2 py-1 text-[#1d405c]"><i class="fas fa-map-marker-alt pr-2 text-[#cfab71]"></i><?php echo htmlspecialchars($room['property_type']); ?></span>
+            <!-- <span class="rounded-full bg-pink-100 px-2 py-1 text-[#1d405c]"><?php echo htmlspecialchars(ucfirst($room['gender_allowed'])); ?></span> -->
+        </div>
+        <p class="text-2xl font-bold text-[#cfab71]">₹<?php echo number_format($r['price']); ?><span class="text-lg font-normal text-slate-100">/month</span></p>
 </div>
-<a href="room_details.php?id=<?php echo $r['id']; ?>" class="btn btn-light w-100">View</a>
+<?php if(isset($_SESSION['user_id']) && $_SESSION['role']=='customer'){ ?>
+<a href="book_room.php?room_id=<?php echo $r['id']; ?>" class="btn bg-slate-100 w-100">Book Now</a>
+<?php } ?>
 </div>
 </div>
+
 
 <?php } ?>
 

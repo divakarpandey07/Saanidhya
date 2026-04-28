@@ -1,6 +1,7 @@
 <?php
+session_start();
 include("includes/db.php");
-$cities=mysqli_query($conn,"SELECT * FROM cities");
+$cities = mysqli_query($conn, "SELECT * FROM cities");
 ?>
 
 <!DOCTYPE html>
@@ -9,24 +10,25 @@ $cities=mysqli_query($conn,"SELECT * FROM cities");
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Saanidhya</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <?php include __DIR__."/includes/tailwind.php"; ?>
 </head>
 <body class="bg-[#cfab7110] text-slate-800 antialiased font-serif">
 
 <nav class="sticky top-0 z-50 border-b border-slate-200 bg-white shadow-sm">
 <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-3">
-<a class="font-semibold text-slate-900" href="index.php" class="h-8"><img class="h-12" src="./assets/logo.png" alt="Saanidhya"></a>
+<a class="font-semibold text-slate-900" href="index.php"><img class="h-12" src="./assets/logo.png" alt="Saanidhya"></a>
 <div class="flex flex-wrap items-center gap-4 text-lg">
 <a class="text-[#1d405c] hover:text-slate-900" href="explore.php">Explore</a>
 <a class="text-[#1d405c] hover:text-slate-900" href="#">PG Finder</a>
 <a class="text-[#1d405c] hover:text-slate-900" href="#">Hostel Listing</a>
-<p class="text-[#1d405c] hover:text-slate-900" >|</p>
+<p class="text-[#1d405c] hover:text-slate-900">|</p>
 <?php
     if(isset($_SESSION['user_id'])){
         echo '
             <a class="rounded-lg bg-[#c64f4f] px-3 py-1.5 font-medium text-white hover:bg-[#ff0000a0]" href="logout.php">Logout</a>
         ';
-    }elseif (!isset($_SESSION['user_id'])){
+    } else {
         echo '
             <a class="text-[#1d405c] hover:text-slate-900" href="login.php">Login</a>
             <a class="rounded-lg bg-[#cfab71] px-3 py-1.5 font-medium text-white hover:bg-[#ba8b40]" href="register.php">Register</a>
@@ -65,10 +67,12 @@ $cities=mysqli_query($conn,"SELECT * FROM cities");
 <a class="inline-flex shrink-0 items-center justify-center rounded-lg border border-slate-300 bg-[#cfab71] px-4 py-2 text-lg font-medium text-white hover:bg-[#ba8b40]" href="explore.php">View all listings</a>
 </div>
 <div class="grid gap-6 my-16 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-<?php while($city=mysqli_fetch_assoc($cities)){ ?>
+<?php while($city=mysqli_fetch_assoc($cities)){ 
+    $image_url = !empty($city['image_link']) ? htmlspecialchars($city['image_link']) : 'https://via.placeholder.com/400x200?text=No+Image';
+?>
 <div class="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-    <div class="h-36 rounded-lg mb-6 w-100% bg-cover bg-center bg-[url('<?php echo htmlspecialchars($city['image_link']); ?>')]"></div>
-    <h3 class="text-lg font-semibold text-slate-900"><?php echo htmlspecialchars($city['city_name']); ?></h3>
+    <div class="h-36 rounded-lg mb-6 w-full bg-cover bg-center" style="background-image: url('<?php echo $image_url; ?>');"></div>
+    <h3 class="text-lg font-semibold text-slate-900"><i class="fas fa-map-marker-alt pr-2 text-[#cfab71]"></i><?php echo htmlspecialchars($city['city_name']); ?></h3>
     <p class="mt-1 text-lg text-slate-600">Rooms and hostels in this city.</p>
     <a class="mt-4 inline-flex rounded-lg bg-[#cfab71] px-4 py-2 text-lg font-medium text-white hover:bg-[#ba8b40]" href="city.php?city_id=<?php echo (int)$city['id']; ?>">Open city</a>
 </div>
@@ -92,7 +96,7 @@ $featured_rooms_result = @mysqli_query($conn, "
 $featured_rooms = ($featured_rooms_result !== false) ? $featured_rooms_result : false;
 ?>
 
-<section class="py-12 md:py-24 from-white to-slate-50 bg-gradient-to-b">
+<section class="py-12 md:py-24 from-white to-slate-50 bg-linear-to-b">
 <div class="mx-auto max-w-7xl p-4">
 <div class="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
 <div>
@@ -111,23 +115,35 @@ $featured_rooms = ($featured_rooms_result !== false) ? $featured_rooms_result : 
             <h3 class="text-2xl text-slate-900"><?php echo htmlspecialchars($room['title']); ?></h3>
             <!-- <span class="shrink-0 rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-700"><?php echo htmlspecialchars(ucfirst($room['is_verified'])); ?></span> -->
         </div>
-        <p class="mt-1 text-lg text-slate-600"><?php echo htmlspecialchars($room['address'] ?: $room['city_name']); ?></p>
+        <p class="mt-1 text-lg text-slate-600"><i class="fas fa-map-marker-alt pr-2 text-[#cfab71]"></i><?php echo htmlspecialchars($room['address'] ?: $room['city_name']); ?></p>
         <div class="my-6 flex flex-wrap gap-2 text-xs">
             <?php if($room['ac'] == 'yes'): ?>
-            <span class="rounded-full bg-blue-100 px-2 py-1 text-[#1d405c]">AC</span>
-            <?php endif; ?>
+                 <div class="rounded-xl py-1 px-2  bg-orange-100 text-[1rem]">
+                    <i class="fas fa-snowflake text-[#cfab71] pr-1"></i>
+                    <span class=" text-[#1d405c]">AC</span>
+                </div>           <?php endif; ?>
             <?php if($room['wifi'] == 'yes'): ?>
-            <span class="rounded-full bg-orange-100 px-2 py-1 text-[#1d405c]">WiFi</span>
+                <div class="rounded-xl py-1 px-2  bg-orange-100 text-[1rem]">
+                    <i class="fas fa-wifi text-[#cfab71] pr-1"></i>
+                    <span class=" text-[#1d405c]">WiFi</span>
+                </div>
             <?php endif; ?>
             <?php if($room['geyser'] == 'yes'): ?>
-            <span class="rounded-full bg-cyan-100 px-2 py-1 text-[#1d405c]">Geyser</span>
-            <?php endif; ?>
-            <span class="rounded-full bg-purple-100 px-2 py-1 text-[#1d405c]"><?php echo htmlspecialchars($room['property_type']); ?></span>
+                 <div class="rounded-xl py-1 px-2  bg-orange-100 text-[1rem]">
+                    <i class="fas fa-hot-tub text-[#cfab71] pr-1"></i>
+                    <span class=" text-[#1d405c]">Geyser</span>
+                </div>            <?php endif; ?>
+            <span class="rounded-full bg-orange-100 text-[1rem] px-2 py-1 text-[#1d405c]"><i class="fas fa-map-marker-alt pr-2 text-[#cfab71]"></i><?php echo htmlspecialchars($room['property_type']); ?></span>
             <!-- <span class="rounded-full bg-pink-100 px-2 py-1 text-[#1d405c]"><?php echo htmlspecialchars(ucfirst($room['gender_allowed'])); ?></span> -->
         </div>
         <div class="mt-4 flex items-center justify-between">
             <p class="text-2xl font-bold text-[#cfab71]">₹<?php echo number_format($room['price']); ?><span class="text-lg font-normal text-slate-500">/month</span></p>
-            <a class="rounded-lg bg-[#1d405c] px-4 py-2 text-lg font-medium text-white hover:bg-[#1d405ca0]" href="room_details.php?id=<?php echo (int)$room['id']; ?>">View Details</a>
+            <div class="flex items-center gap-2">
+                <a class="flex h-10 w-10 items-center justify-center rounded-full border border-[#cfab71] text-[#cfab71] hover:bg-[#cfab71] hover:text-white" href="wishlist_action.php?room_id=<?php echo (int)$room['id']; ?>">
+                    <i class="fas fa-heart"></i>
+                </a>
+                <a class="rounded-lg bg-[#1d405c] px-4 py-2 text-lg font-medium text-white hover:bg-[#1d405ca0]" href="room_details.php?id=<?php echo (int)$room['id']; ?>">View Details</a>
+            </div>
         </div>
     </div>
 </div>
@@ -373,21 +389,20 @@ $bookings_count = isset($total_bookings['count']) ? (int)$total_bookings['count'
 <p class="text-center text-lg text-slate-300">Saanidhya</p>
 </div>
 </footer>
+
 <script>
-const texts=[
-["Find Your Perfect Stay","Safe & Verified Rooms"],
-["Affordable Rooms Near You","Budget Friendly Options"],
-["Comfort Living Experience","Feel Like Home"],
-["Trusted Student Housing","Secure & Verified"]
+const texts = [
+    ["Find Your Perfect Stay","Safe & Verified Rooms"],
+    ["Affordable Rooms Near You","Budget Friendly Options"],
+    ["Comfort Living Experience","Feel Like Home"],
+    ["Trusted Student Housing","Secure & Verified"]
 ];
-
-let i=0;
-
-setInterval(()=>{
-i=(i+1)%texts.length;
-document.getElementById("mainText").innerText=texts[i][0];
-document.getElementById("subText").innerText=texts[i][1];
-},8000);
+let i = 0;
+setInterval(() => {
+    i = (i + 1) % texts.length;
+    document.getElementById("mainText").innerText = texts[i][0];
+    document.getElementById("subText").innerText = texts[i][1];
+}, 8000);
 </script>
 </body>
 </html>
