@@ -10,9 +10,11 @@ exit();
 $user_id=$_SESSION['user_id'];
 
 $bookings=mysqli_query($conn,"
-SELECT bookings.*,rooms.*
+SELECT bookings.*,rooms.*,cities.city_name,room_images.image_path
 FROM bookings
 JOIN rooms ON bookings.room_id=rooms.id
+LEFT JOIN cities ON rooms.city_id=cities.id
+LEFT JOIN room_images ON rooms.id=room_images.room_id
 WHERE bookings.user_id=$user_id
 ");
 
@@ -30,6 +32,7 @@ WHERE rooms.is_verified='yes'
 <head>
 <title>Customer Dashboard</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <?php include __DIR__."/includes/tailwind.php"; ?>
 <style>
@@ -74,29 +77,7 @@ border:none;
 </head>
 
 <body>
-<nav class="sticky top-0 z-50 border-b border-slate-200 bg-white shadow-sm">
-<div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-3">
-<a class="font-semibold text-slate-900" href="index.php" class="h-8"><img class="h-12" src="./assets/logo.png" alt="Saanidhya"></a>
-<div class="flex flex-wrap items-center gap-4 text-lg">
-<a class="text-[#1d405c] hover:text-slate-900" href="explore.php">Explore</a>
-<a class="text-[#1d405c] hover:text-slate-900" href="#">PG Finder</a>
-<a class="text-[#1d405c] hover:text-slate-900" href="#">Hostel Listing</a>
-<p class="text-[#1d405c] hover:text-slate-900" >|</p>
-<?php
-    if(isset($_SESSION['user_id'])){
-        echo '
-            <a class="rounded-lg bg-[#c64f4f] px-3 py-1.5 font-medium text-white hover:bg-[#ff0000a0]" href="logout.php">Logout</a>
-        ';
-    }elseif (!isset($_SESSION['user_id'])){
-        echo '
-            <a class="text-[#1d405c] hover:text-slate-900" href="login.php">Login</a>
-            <a class="rounded-lg bg-[#cfab71] px-3 py-1.5 font-medium text-white hover:bg-[#ba8b40]" href="register.php">Register</a>
-        ';
-    }
-?>
-</div>
-</div>
-</nav>
+<?php include("navbar.php"); ?>
 <div class="overlay"></div>
 
 <div class="container content">
@@ -106,59 +87,96 @@ border:none;
 </div>
 
 <h4 class="text-3xl my-4">My Bookings</h4>
-<hr>
+<hr class="mb-4">
 
 <?php if(mysqli_num_rows($bookings)>0){ ?>
+<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 <?php while($b=mysqli_fetch_assoc($bookings)){ ?>
-
-<div class="glass bg-[#aaaa]">
-<h5><?php echo $b['title']; ?></h5>
-
-<?php if($b['status']=='approved'){ ?>
-<span class="badge bg-success">Approved</span>
-<?php }elseif($b['status']=='rejected'){ ?>
-<span class="badge bg-danger">Rejected</span>
-<?php }else{ ?>
-<span class="badge bg-warning">Pending</span>
-<?php } ?>
-
+<div class="glass bg-white/30 rounded-xl overflow-hidden">
+    <div class="h-40 bg-cover bg-center rounded-xl" style="background-image: url('<?php echo !empty($b['image_path']) ? htmlspecialchars($b['image_path']) : 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400'; ?>')"></div>
+    <div class="py-4">
+        <h5 class="text-2xl font-semibold text-white"><?php echo htmlspecialchars($b['title']); ?></h5>
+        <p class="text-lg text-white/80 mt-1"><i class="fas fa-map-marker-alt mr-1"></i> <?php echo htmlspecialchars($b['city_name'] ?? 'Location not specified'); ?></p>
+        <p class="text-xl font-bold text-[#cfab71] mt-2">₹<?php echo number_format($b['price']); ?><span class="text-sm font-normal text-white/60">/month</span></p>
+        <div class="flex items-center justify-between mt-3">
+            <?php if($b['status']=='approved'){ ?>
+            <span class="rounded-full bg-green-500 px-3 py-1 text-sm font-medium text-white">Approved</span>
+            <?php }elseif($b['status']=='rejected'){ ?>
+            <span class="rounded-full bg-red-500 px-3 py-1 text-sm font-medium text-white">Rejected</span>
+            <?php }else{ ?>
+            <span class="rounded-full bg-yellow-500 px-3 py-1 text-sm font-medium text-white">Pending</span>
+            <?php } ?>
+            <span class="text-md text-white"><?php echo date('d M Y', strtotime($b['booking_date'])); ?></span>
+        </div>
+        <?php if($b['status']=='pending'){ ?>
+        <div class="mt-3">
+            <a href="cancel_booking.php?booking_id=<?php echo (int)$b['id']; ?>" class="inline-block w-full text-center rounded-lg text-red-500 bg-[#e0cdad] hover:bg-red-600 px-3 py-2 text-sm font-medium transition" onclick="return confirm('Are you sure you want to cancel this booking?');">Cancel Booking</a>
+        </div>
+        <?php } ?>
+    </div>
 </div>
-
 <?php } ?>
+</div>
 <?php } else { ?>
 <p class="text-lg my-4 text-center">No bookings yet</p>
 <?php } ?>
 
 
 <h4 class="text-3xl my-4">Available Rooms</h4>
-<hr>
+<hr class="mb-4">
 
-<div class="row mt-6">
-
+<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    
 <?php while($r=mysqli_fetch_assoc($rooms)){ ?>
 
-<div class="col-md-3">
-<div class="card mb-3 bg-[#aaaa] p-4 rounded-lg">
-
-<img src="<?php echo $r['image_path']; ?>" style="height:150px;object-fit:cover;" class="rounded-lg">
-
-<div class="p-2">
-<h6 class="text-xl"><?php echo $r['title']; ?></h6>
-<p><?php echo $r['city_name']; ?></p>
-<p class="inline-block bg-[#aaa] px-2 py-1 rounded-3xl my-2">₹<?php echo $r['price']; ?></p>
-
-<a href="book_room.php?room_id=<?php echo $r['id']; ?>" class="btn btn-light btn-sm mt-4 w-100">Book Now</a>
-
-</div>
-
-</div>
+<div class="glass bg-white/30 rounded-xl overflow-hidden hover:bg-white/20 transition">
+    <div class="h-36 bg-cover bg-center rounded-xl" style="background-image: url('<?php echo !empty($r['image_path']) ? htmlspecialchars($r['image_path']) : 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400'; ?>')"></div>
+    <div class="py-4">
+        <h6 class="text-2xl font-semibold text-white"><?php echo htmlspecialchars($r['title']); ?></h6>
+        <p class="text-lg text-white/70 mt-1"><i class="fas fa-map-marker-alt mr-1"></i> <?php echo htmlspecialchars($r['city_name']); ?></p>
+        <div class="my-6 flex flex-wrap gap-2 text-xs">
+            <?php if($r['ac'] == 'yes'): ?>
+                <div class="rounded-xl py-1 px-2  bg-orange-100 text-[1rem]">
+                    <i class="fas fa-snowflake text-[#cfab71] pr-1"></i>
+                    <span class=" text-[#1d405c]">AC</span>
+                </div>           <?php endif; ?>
+            <?php if($r['wifi'] == 'yes'): ?>
+                <div class="rounded-xl py-1 px-2  bg-orange-100 text-[1rem]">
+                    <i class="fas fa-wifi text-[#cfab71] pr-1"></i>
+                    <span class=" text-[#1d405c]">WiFi</span>
+                </div>
+                <?php endif; ?>
+                <?php if($r['geyser'] == 'yes'): ?>
+                    <div class="rounded-xl py-1 px-2  bg-orange-100 text-[1rem]">
+                    <i class="fas fa-hot-tub text-[#cfab71] pr-1"></i>
+                    <span class=" text-[#1d405c]">Geyser</span>
+                </div>            <?php endif; ?>
+            <span class="rounded-full bg-orange-100 text-[1rem] px-2 py-1 text-[#1d405c]"><i class="fas fa-map-marker-alt pr-2 text-[#cfab71]"></i><?php echo htmlspecialchars($r['property_type']); ?></span>
+        </div>
+        <p class="text-xl font-bold text-[#cfab71] mt-3">₹<?php echo number_format($r['price']); ?><span class="text-sm font-normal text-white/60">/month</span></p>
+        <a href="book_room.php?room_id=<?php echo (int)$r['id']; ?>" class="mt-3 inline-block w-full text-center rounded-lg bg-[#cfab71] px-3 py-2 text-sm font-medium text-white hover:bg-[#ba8b40]">Book Now</a>
+    </div>
 </div>
 
 <?php } ?>
 
 </div>
 
+<hr class="mb-4">
 <a href="wishlist.php" class="btn btn-light mt-3">Wishlist</a>
+<!-- <h4 class="text-3xl my-4">Wishlist</h4> -->
+<?php
+    $user_id=$_SESSION['user_id'];
+    $query=mysqli_query($conn,"
+    SELECT rooms.*,room_images.image_path
+    FROM wishlist
+    JOIN rooms ON wishlist.room_id=rooms.id
+    LEFT JOIN room_images ON rooms.id=room_images.room_id
+    WHERE wishlist.user_id='$user_id'
+    GROUP BY rooms.id
+    ORDER BY wishlist.id DESC
+    ");
+?>
 
 </div>
 

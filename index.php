@@ -1,9 +1,3 @@
-<?php
-session_start();
-include("includes/db.php");
-$cities = mysqli_query($conn, "SELECT * FROM cities");
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,29 +9,7 @@ $cities = mysqli_query($conn, "SELECT * FROM cities");
 </head>
 <body class="bg-[#cfab7110] text-slate-800 antialiased font-serif">
 
-<nav class="sticky top-0 z-50 border-b border-slate-200 bg-white shadow-sm">
-<div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-3">
-<a class="font-semibold text-slate-900" href="index.php"><img class="h-12" src="./assets/logo.png" alt="Saanidhya"></a>
-<div class="flex flex-wrap items-center gap-4 text-lg">
-<a class="text-[#1d405c] hover:text-slate-900" href="explore.php">Explore</a>
-<a class="text-[#1d405c] hover:text-slate-900" href="#">PG Finder</a>
-<a class="text-[#1d405c] hover:text-slate-900" href="#">Hostel Listing</a>
-<p class="text-[#1d405c] hover:text-slate-900">|</p>
-<?php
-    if(isset($_SESSION['user_id'])){
-        echo '
-            <a class="rounded-lg bg-[#c64f4f] px-3 py-1.5 font-medium text-white hover:bg-[#ff0000a0]" href="logout.php">Logout</a>
-        ';
-    } else {
-        echo '
-            <a class="text-[#1d405c] hover:text-slate-900" href="login.php">Login</a>
-            <a class="rounded-lg bg-[#cfab71] px-3 py-1.5 font-medium text-white hover:bg-[#ba8b40]" href="register.php">Register</a>
-        ';
-    }
-?>
-</div>
-</div>
-</nav>
+<?php include("navbar.php"); ?>
 
 <header class="relative flex min-h-[clamp(420px,68vh,640px)] items-center bg-cover bg-center text-white" style="background-image:linear-gradient(120deg,rgba(15,23,42,0.82) 0%,rgba(30,41,59,0.55) 45%,rgba(15,23,42,0.7) 100%),url('https://images.unsplash.com/photo-1522708323590-d24dbb6b0267');">
 <div class="mx-auto w-full max-w-7xl px-4 py-12 md:py-20">

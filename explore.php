@@ -3,6 +3,8 @@ session_start();
 include("includes/db.php");
 
 $price=isset($_GET['price'])?$_GET['price']:'';
+$min_price=isset($_GET['min_price'])?$_GET['min_price']:'';
+$property_type=isset($_GET['property_type'])?$_GET['property_type']:'';
 
 $query="SELECT rooms.*,cities.city_name,room_images.image_path
 FROM rooms
@@ -12,6 +14,14 @@ WHERE rooms.is_verified='yes'";
 
 if($price!=''){
 $query.=" AND rooms.price<=$price";
+}
+
+if($min_price!=''){
+$query.=" AND rooms.price>=$min_price";
+}
+
+if($property_type!=''){
+$query.=" AND rooms.property_type='$property_type'";
 }
 
 $query.=" GROUP BY rooms.id";
@@ -48,30 +58,8 @@ border-radius:15px;
 
 <body>
 
-<nav class="sticky top-0 z-50 border-b border-slate-200 bg-white shadow-sm">
-<nav class="sticky top-0 z-50 border-b border-slate-200 bg-white shadow-sm">
-<div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-3">
-<a class="font-semibold text-slate-900" href="index.php"><img class="h-12" src="./assets/logo.png" alt="Saanidhya"></a>
-<div class="flex flex-wrap items-center gap-4 text-lg">
-<a class="text-[#1d405c] hover:text-slate-900" href="explore.php">Explore</a>
-<a class="text-[#1d405c] hover:text-slate-900" href="#">PG Finder</a>
-<a class="text-[#1d405c] hover:text-slate-900" href="#">Hostel Listing</a>
-<p class="text-[#1d405c] hover:text-slate-900">|</p>
-<?php
-    if(isset($_SESSION['user_id'])){
-        echo '
-            <a class="rounded-lg bg-[#c64f4f] px-3 py-1.5 font-medium text-white hover:bg-[#ff0000a0]" href="logout.php">Logout</a>
-        ';
-    } else {
-        echo '
-            <a class="text-[#1d405c] hover:text-slate-900" href="login.php">Login</a>
-            <a class="rounded-lg bg-[#cfab71] px-3 py-1.5 font-medium text-white hover:bg-[#ba8b40]" href="register.php">Register</a>
-        ';
-    }
-?>
-</div>
-</div>
-</nav>
+<?php include("navbar.php"); ?>
+
 <div class="overlay"></div>
 
 <div class="container content mt-4">
@@ -81,11 +69,21 @@ border-radius:15px;
 <!-- FILTER -->
 <form method="GET" class="glass bg-[#aaaa] mb-4">
 <div class="row">
-<div class="col-md-4">
+<div class="col-md-3">
+<input type="number" name="min_price" placeholder="Min Price" class="form-control" value="<?php echo $min_price; ?>">
+</div>
+<div class="col-md-3">
 <input type="number" name="price" placeholder="Max Price" class="form-control" value="<?php echo $price; ?>">
 </div>
-<div class="col-md-4">
-<button class="btn btn-light w-100">Apply Filter</button>
+<div class="col-md-3">
+<select name="property_type" class="form-control">
+    <option value="">All Types</option>
+    <option value="flat" <?php echo ($property_type=='flat')?'selected':''; ?>>Flat</option>
+    <option value="hostel" <?php echo ($property_type=='hostel')?'selected':''; ?>>Hostel</option>
+</select>
+</div>
+<div class="col-md-3">
+<button class="btn bg-orange-100 w-100">Apply Filter</button>
 </div>
 </div>
 </form>
@@ -118,8 +116,8 @@ border-radius:15px;
                     <i class="fas fa-hot-tub text-[#cfab71] pr-1"></i>
                     <span class=" text-[#1d405c]">Geyser</span>
                 </div>            <?php endif; ?>
-            <span class="rounded-full bg-orange-100 text-[1rem] px-2 py-1 text-[#1d405c]"><i class="fas fa-map-marker-alt pr-2 text-[#cfab71]"></i><?php echo htmlspecialchars($room['property_type']); ?></span>
-            <!-- <span class="rounded-full bg-pink-100 px-2 py-1 text-[#1d405c]"><?php echo htmlspecialchars(ucfirst($room['gender_allowed'])); ?></span> -->
+            <span class="rounded-full bg-orange-100 text-[1rem] px-2 py-1 text-[#1d405c]"><i class="fas fa-map-marker-alt pr-2 text-[#cfab71]"></i><?php echo htmlspecialchars($r['property_type']); ?></span>
+            <!-- <span class="rounded-full bg-pink-100 px-2 py-1 text-[#1d405c]"><?php echo htmlspecialchars(ucfirst($r['gender_allowed'])); ?></span> -->
         </div>
         <p class="text-2xl font-bold text-[#cfab71]">₹<?php echo number_format($r['price']); ?><span class="text-lg font-normal text-slate-100">/month</span></p>
 </div>
