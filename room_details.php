@@ -14,7 +14,7 @@ SELECT rooms.*,cities.city_name,room_images.image_path
 FROM rooms
 LEFT JOIN cities ON rooms.city_id=cities.id
 LEFT JOIN room_images ON rooms.id=room_images.room_id
-WHERE rooms.id=$id AND rooms.is_verified='yes'
+WHERE rooms.id=$id AND rooms.is_verified='verified'
 "));
 ?>
 

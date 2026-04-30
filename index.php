@@ -11,7 +11,7 @@
 
 <?php include("navbar.php"); ?>
 
-<header class="relative flex min-h-[clamp(420px,68vh,640px)] items-center bg-cover bg-center text-white" style="background-image:linear-gradient(120deg,rgba(15,23,42,0.82) 0%,rgba(30,41,59,0.55) 45%,rgba(15,23,42,0.7) 100%),url('https://images.unsplash.com/photo-1522708323590-d24dbb6b0267');">
+<header class="relative flex h-[80dvh] items-center bg-cover bg-center text-white" style="background-image:linear-gradient(120deg,rgba(15,23,42,0.82) 0%,rgba(30,41,59,0.55) 45%,rgba(15,23,42,0.7) 100%),url('https://images.unsplash.com/photo-1522708323590-d24dbb6b0267');">
 <div class="mx-auto w-full max-w-7xl px-4 py-12 md:py-20">
 <div class="max-w-2xl py-20">
 <p class="mb-6 text-md font-medium uppercase tracking-wider text-white/60">Student housing</p>
@@ -60,7 +60,7 @@ $featured_rooms_result = @mysqli_query($conn, "
     FROM rooms r 
     LEFT JOIN cities c ON r.city_id = c.id 
     LEFT JOIN room_images ri ON r.id = ri.room_id 
-    WHERE r.is_verified = 'yes' 
+    WHERE r.is_verified = 'verified' 
     GROUP BY r.id 
     ORDER BY r.created_at DESC 
     LIMIT 6
@@ -312,6 +312,14 @@ $bookings_count = isset($total_bookings['count']) ? (int)$total_bookings['count'
 <section class="py-12 bg-white md:py-24">
 <div class="mx-auto max-w-7xl px-4">
 <h2 class="mb-12 text-center text-5xl font-semibold text-slate-900">Get started</h2>
+<?php if(isset($_SESSION['user_id'])): ?>
+<div class="mx-auto grid max-w-2xl gap-6 md:grid-cols-1 ">
+    <div class="flex flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h3 class="text-3xl text-slate-900 text-center">Explore properties</h3>
+        <p class="mt-2 flex-1 text-lg py-4 text-slate-600 text-center">Browse and book rooms that suit your needs.</p>
+<a class="mt-4 inline-flex justify-center rounded-lg bg-[#cfab71] px-4 py-2 text-lg font-medium text-white hover:bg-[#cfab71e0]" href="explore.php">Explore now</a>
+</div>
+<?php else: ?>
 <div class="mx-auto grid max-w-4xl gap-6 md:grid-cols-2">
 <div class="flex flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
 <h3 class="text-3xl text-slate-900">Already have an account?</h3>
@@ -323,6 +331,7 @@ $bookings_count = isset($total_bookings['count']) ? (int)$total_bookings['count'
 <p class="mt-2 flex-1 text-lg py-4 text-slate-600">Create a free account to save rooms and send booking requests.</p>
 <a class="mt-4 inline-flex justify-center rounded-lg bg-[#cfab71] px-4 py-2 text-lg font-medium text-white hover:bg-[#cfab71e0]" href="register.php">Create account</a>
 </div>
+<?php endif; ?>
 </div>
 </div>
 </section>
@@ -364,10 +373,10 @@ $bookings_count = isset($total_bookings['count']) ? (int)$total_bookings['count'
 
 <script>
 const texts = [
-    ["Find Your Perfect Stay","Safe & Verified Rooms"],
-    ["Affordable Rooms Near You","Budget Friendly Options"],
-    ["Comfort Living Experience","Feel Like Home"],
-    ["Trusted Student Housing","Secure & Verified"]
+    ["Find Your Perfect Stay","Experience peace of mind with our safe and verified rooms, ensuring a secure environment for all students."],
+    ["Affordable Rooms Near You","Enjoy budget-friendly options that fit your student lifestyle without compromising on quality and comfort."],
+    ["Comfort Living Experience","Immerse yourself in a comfortable living experience that feels just like home, with all the amenities you need."],
+    ["Trusted Student Housing","Choose from trusted student housing options that are secure and verified for your utmost safety and satisfaction."]
 ];
 let i = 0;
 setInterval(() => {

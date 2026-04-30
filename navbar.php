@@ -20,16 +20,19 @@ $cities = isset($conn) ? mysqli_query($conn, "SELECT * FROM cities") : false;
             <a class="text-[#1d405c] hover:text-slate-900" href="explore.php">Explore</a>
             <a class="text-[#1d405c] hover:text-slate-900" href="explore.php?property_type=flat">PG Finder</a>
             <a class="text-[#1d405c] hover:text-slate-900" href="explore.php?property_type=hostel">Hostel Listing</a>
-            <p class="text-[#1d405c] hover:text-slate-900">|</p>
             <?php
                 if(isset($_SESSION['user_id'])){
                     echo '
+                        <a class="text-[#1d405c] hover:text-slate-900" href="wishlist.php">Wishlist</a>
+                        <a class="text-[#1d405c] hover:text-slate-900" href="customer_dashboard.php">Dashboard</a>
+                        <p class="text-[#1d405c] hover:text-slate-900">|</p>
                         <a class="rounded-lg bg-[#c64f4f] px-3 py-1.5 font-medium text-white hover:bg-[#ff0000a0]" href="logout.php">Logout</a>
-                    ';
-                } else {
-                    echo '
-                        <a class="text-[#1d405c] hover:text-slate-900" href="login.php">Login</a>
-                        <a class="rounded-lg bg-[#cfab71] px-3 py-1.5 font-medium text-white hover:bg-[#ba8b40]" href="register.php">Register</a>
+                        ';
+                    } else {
+                        echo '
+                            <p class="text-[#1d405c] hover:text-slate-900">|</p>
+                            <a class="text-[#1d405c] hover:text-slate-900" href="login.php">Login</a>
+                            <a class="rounded-lg bg-[#cfab71] px-3 py-1.5 font-medium text-white hover:bg-[#ba8b40]" href="register.php">Register</a>
                     ';
                 }
             ?>

@@ -14,7 +14,7 @@ if(!isset($_GET['id'])){
 
 $id = intval($_GET['id']);
 
-$result = mysqli_query($conn,"UPDATE rooms SET is_verified='yes' WHERE id=$id");
+$result = mysqli_query($conn,"UPDATE rooms SET is_verified='verified' WHERE id=$id");
 
 if($result){
     header("Location: admin_dashboard.php");

@@ -83,7 +83,7 @@ border:none;
 <div class="container content">
 
 <div class="d-flex justify-content-between mb-3">
-<h3 class="text-4xl">Customer Dashboard</h3>
+<h3 class="text-4xl my-6 w-full text-center font-bold">Customer Dashboard</h3>
 </div>
 
 <h4 class="text-3xl my-4">My Bookings</h4>
@@ -110,7 +110,7 @@ border:none;
         </div>
         <?php if($b['status']=='pending'){ ?>
         <div class="mt-3">
-            <a href="cancel_booking.php?booking_id=<?php echo (int)$b['id']; ?>" class="inline-block w-full text-center rounded-lg text-red-500 bg-[#e0cdad] hover:bg-red-600 px-3 py-2 text-sm font-medium transition" onclick="return confirm('Are you sure you want to cancel this booking?');">Cancel Booking</a>
+            <a href="cancel_booking.php?booking_id=<?php echo (int)$b['id']; ?>" class="inline-block w-full text-center rounded-lg text-red-500 bg-[#e0cdad] hover:bg-[#e2c085] px-3 py-2 text-sm font-medium transition" onclick="return confirm('Are you sure you want to cancel this booking?');">Cancel Booking</a>
         </div>
         <?php } ?>
     </div>
@@ -162,21 +162,7 @@ border:none;
 
 </div>
 
-<hr class="mb-4">
-<a href="wishlist.php" class="btn btn-light mt-3">Wishlist</a>
-<!-- <h4 class="text-3xl my-4">Wishlist</h4> -->
-<?php
-    $user_id=$_SESSION['user_id'];
-    $query=mysqli_query($conn,"
-    SELECT rooms.*,room_images.image_path
-    FROM wishlist
-    JOIN rooms ON wishlist.room_id=rooms.id
-    LEFT JOIN room_images ON rooms.id=room_images.room_id
-    WHERE wishlist.user_id='$user_id'
-    GROUP BY rooms.id
-    ORDER BY wishlist.id DESC
-    ");
-?>
+
 
 </div>
 

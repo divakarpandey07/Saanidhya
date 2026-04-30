@@ -10,7 +10,7 @@ $query="SELECT rooms.*,cities.city_name,room_images.image_path
 FROM rooms
 JOIN cities ON rooms.city_id=cities.id
 LEFT JOIN room_images ON rooms.id=room_images.room_id
-WHERE rooms.is_verified='yes'";
+WHERE rooms.is_verified='verified'";
 
 if($price!=''){
 $query.=" AND rooms.price<=$price";
@@ -95,7 +95,7 @@ border-radius:15px;
 <div class="col-md-1 w-[23%] m-2">
 <div class="glass bg-[#aaaa]">
 <img src="<?php echo $r['image_path']; ?>" class="w-100 rounded-xl mb-2" style="height:150px;object-fit:cover;">
-<div class="my-4">
+<div class="mt-4 mb-2 relative min-h-[270px]">
     <h2 class="bold text-2xl font-semibold"><?php echo $r['title']; ?></h2>
     <p class="mt-1 text-xl"><i class="fas fa-map-marker-alt text-[#cfab71] pr-1"></i>
 <?php echo $r['city_name']; ?></p>
@@ -119,7 +119,15 @@ border-radius:15px;
             <span class="rounded-full bg-orange-100 text-[1rem] px-2 py-1 text-[#1d405c]"><i class="fas fa-map-marker-alt pr-2 text-[#cfab71]"></i><?php echo htmlspecialchars($r['property_type']); ?></span>
             <!-- <span class="rounded-full bg-pink-100 px-2 py-1 text-[#1d405c]"><?php echo htmlspecialchars(ucfirst($r['gender_allowed'])); ?></span> -->
         </div>
-        <p class="text-2xl font-bold text-[#cfab71]">₹<?php echo number_format($r['price']); ?><span class="text-lg font-normal text-slate-100">/month</span></p>
+        <div class="absolute bottom-0 w-full">
+            <p class="text-2xl font-bold text-[#cfab71]">₹<?php echo number_format($r['price']); ?><span class="text-lg font-normal text-slate-100">/month</span></p>
+            <div class="flex items-center justify-between mt-4">
+                <a class="flex h-10 w-10 items-center justify-center rounded-full border border-[#cfab71] text-[#cfab71] hover:bg-[#cfab71] hover:text-white" href="wishlist_action.php?room_id=<?php echo (int)$r['id']; ?>">
+                    <i class="fas fa-heart"></i>
+                </a>
+                <a class="rounded-lg right-0 bg-[#1d405c] px-4 py-2 text-lg font-medium text-white hover:bg-[#1d405ca0]" href="room_details.php?id=<?php echo (int)$r['id']; ?>">View Details</a>
+            </div>
+        </div>
 </div>
 <?php if(isset($_SESSION['user_id']) && $_SESSION['role']=='customer'){ ?>
 <a href="book_room.php?room_id=<?php echo $r['id']; ?>" class="btn bg-slate-100 w-100">Book Now</a>
